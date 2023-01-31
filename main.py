@@ -14,6 +14,8 @@ class Student:
         self.grades = {}
 
     def avg_grade(self):
+        if not self.grades:
+            return 0
         list_grades = [] # создаем пустой спиcок
         for mark in self.grades.values():
             # проходимся по значениям словаря
@@ -43,14 +45,21 @@ class Student:
 
         return info_some_student
 
-    def __eq__(self, other: 'Student') -> bool:
+    def __eq__(self, other) -> bool:
+        if not isinstance (other, self.__class__):
+            raise Exception('Ошибка')
+            #Проверка на принадлежность к классу, чтобы не сравнивать сущности разных классов.
         return self.avg_grade() == other.avg_grade()
 
-    def __lt__(self, other:'Student') -> bool:
+    def __lt__(self, other) -> bool:
+        if not isinstance (other, self.__class__):
+            raise Exception('Ошибка')
         return self.avg_grade() < other.avg_grade()
 
-    def __gt__(self, other:'Student') -> bool:
-        return self.avg_grade() > other.avg_grade()
+    def __le__(self, other) -> bool:
+        if not isinstance (other, self.__class__):
+            raise Exception('Ошибка')
+        return self.avg_grade() <= other.avg_grade()
 
 class Reviewer(Mentor):
     # из родителя (Mentor) берётся self.name, self.surname и self.courses_attached
@@ -85,14 +94,7 @@ class Lecturer(Mentor, Student):
         info_some_lecturer = f'Имя:{self.name} \nФамилия: {self.surname} \nСредняя оценка за лекции: {self.avg_grade()}'
         return info_some_lecturer
 
-    def __eq__(self, other: 'Lecturer') -> bool:
-        return self.avg_grade() == other.avg_grade()
 
-    def __lt__(self, other:'Lecturer') -> bool:
-        return self.avg_grade() < other.avg_grade()
-
-    def __gt__(self, other:'Lecturer') -> bool:
-        return self.avg_grade() > other.avg_grade()
 
 
 
@@ -169,34 +171,43 @@ print()
 
 
 print('Средние оценки студентов за домашние задания одинаковые: ', some_student == some_student2)
-print(f'Cредняя оценка {some_student.name} {some_student.surname} меньше, чем у  {some_student2.name} {some_student2.surname}:', some_student < some_student2)
-print(f'Cредняя оценка {some_student.name} {some_student.surname} больше, чем у {some_student2.name} {some_student2.surname:}:', some_student > some_student2)
+print(f'Cредняя оценка {some_student.name} {some_student.surname} больше, чем у  {some_student2.name} {some_student2.surname}:', some_student > some_student2)
+print(f'Cредняя оценка {some_student.name} {some_student.surname} меньше или равно, чем у {some_student2.name} {some_student2.surname:}:', some_student <= some_student2)
 
 print('Средние оценки лекторов за лекции одинаковые: ', some_lecturer == some_lecturer2)
-print(f'Cредняя оценка {some_lecturer.name} {some_lecturer.surname} меньше, чем у  {some_lecturer2.name} {some_lecturer.surname}:', some_lecturer < some_lecturer2)
 print(f'Cредняя оценка {some_lecturer.name} {some_lecturer.surname} больше, чем у  {some_lecturer2.name} {some_lecturer.surname}:', some_lecturer > some_lecturer2)
+print(f'Cредняя оценка {some_lecturer.name} {some_lecturer.surname} меньше или равно, чем у {some_lecturer2.name} {some_lecturer.surname}:', some_lecturer <= some_lecturer2)
 
 # Функция для подсчета средней оценки за домашние задания по всем студентам в рамках конкретного курса
 # в качестве аргументов принимает список студентов и название курса.
 
 
-def average_s_grade_on_the_course(list, course):
+def average_s_grade_on_the_course(persons, course):
     # в качестве аргументов принимаем список студентов (или лекторов) и название курса
+    if not isinstance(persons, list):
+        return 'Not list'
+        # проверка принадлежности экземпляра к классу
     average_grade_course = []
     # вновь создаем пустой список
-    for student in list:
+    for student in persons:
         average_grade_course += student.grades.get(course, [])
         # get возвращает значение по ключу (course) и записывает в average_grade_course = [], а course подается в print ниже
+    if not average_grade_course:
+        return "По такому курсу ни у кого нет оценок"
     return round(sum(average_grade_course) / len(average_grade_course), 1)
 
-def average_l_grade_on_the_course(list, course):
+def average_l_grade_on_the_course(persons, course):
     # в качестве аргументов принимаем список студентов (или лекторов) и название курса
+    if not isinstance(persons, list):
+        return 'Not list'
     average_grade_course = []
     # вновь создаем пустой список
-    for lecturer in list:
+    for lecturer in persons:
         # проходимся по элементам списка
         average_grade_course += lecturer.grades.get(course, [])
         # get возвращает значение по ключу (course) и записывает в average_grade_course = [], а course подается в print ниже
+    if not average_grade_course:
+        return "По такому курсу ни у кого нет оценок"
     return round(sum(average_grade_course) / len(average_grade_course), 1)
 
 print()
